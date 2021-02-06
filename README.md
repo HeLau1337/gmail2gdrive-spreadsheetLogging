@@ -1,10 +1,16 @@
-Gmail2GDrive
+Gmail2GDrive (+ logging attachment information in a Google Spreadsheet)
 ============
 
 Gmail2GDrive is a Google Apps Script which automatically stores and sorts Gmail attachments into Google Drive folders, and can also save the thread as a PDF file.
 
 It does so by defining a list of rules which consist of Gmail search filters and Google Drive destination folders.
 This way the attachments of periodic emails can be automatically organized in folders without the need to install and run anything on the client.
+
+About this fork
+---------------
+This fork of the original Gmail2GDrive project adds custom logging of various information about the attachments in a Google Spreadsheet. This includes the option to split the mail's subject at a separator and write the different components of the subject in their own spreadsheet columns.
+
+At the moment, the remaining part of this README document contains no further information about the adjustments made by this fork. This is a [known issue](https://github.com/HeLau1337/gmail2gdrive-spreadsheetLogging/issues/2).
 
 Features
 --------
