@@ -24,7 +24,7 @@ function getGmail2GDriveConfig() {
         // and archive the thread.
         "filter": "has:attachment from:example1@example.com to:my.name+2drive@gmail.com",
         "folder": "'My-mail-attachments/example1/invoices'",
-        "filenameTo": "invoice_'%s'", // insert "yyyy-MM-dd" in this String to add today's date to the filename.
+        "filenameTo": "'invoice_%s'", // insert 'yyyy-MM-dd' (including single quotation marks!) to add today's date to the filename.
         "archive": true,
         
         // Hier kann man bestimmen, womit '%s' oben bei "filenameTo" ersetzt werden soll.
