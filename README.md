@@ -1,4 +1,4 @@
-Gmail2GDrive (+ logging attachment information in a Google Spreadsheet)
+Gmail2GDrive (+ Google Spreadsheet logging)
 ============
 
 Gmail2GDrive is a Google Apps Script which automatically stores and sorts Gmail attachments into Google Drive folders, and can also save the thread as a PDF file.
