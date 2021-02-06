@@ -18,41 +18,78 @@ function getGmail2GDriveConfig() {
     "timezone": "GMT",
     // Processing rules:
     "rules": [
-      { // Store all attachments sent to my.name+scans@gmail.com to the folder "Scans"
-        "filter": "has:attachment to:my.name+scans@gmail.com",
-        "folder": "'Scans'-yyyy-MM-dd"
+      { // Store all attachments from example1@example.com to the folder "My-mail-attachments/example1/invoices" 
+        // while renaming all attachments to the pattern defined in 'filenameTo' 
+        // (which is dependent on the keywords within "filenameBasedOnKeywords")
+        // and archive the thread.
+        "filter": "has:attachment from:example1@example.com to:my.name+2drive@gmail.com",
+        "folder": "'My-mail-attachments/example1/invoices'",
+        "filenameTo": "invoice_'%s'", // insert "yyyy-MM-dd" in this String to add today's date to the filename.
+        "archive": true,
+        
+        // Hier kann man bestimmen, womit '%s' oben bei "filenameTo" ersetzt werden soll.
+        // Auswahlmöglichkeiten: 
+        //     Alle Standard-Spalten, die in der SpreadsheetConfig unter "columns" stehen. Bsp.: "id", "mailInboxDate", ..., "subject".
+        //     + alle keywords, die in der SpreadsheetConfig unter columns.splitSubject.keywords stehen. Bsp.: "Company:", "Invoice-No.:", ...
+        "filenameBasedOnKeywords": [
+          // Reihenfolge hier = Reihenfolge im Dateinamen
+          "Date:",
+          "Invoice-No.:",
+        ],
       },
-      { // Store all attachments from example1@example.com to the folder "Examples/example1"
-        "filter": "has:attachment from:example1@example.com",
-        "folder": "'Examples/example1'"
-      },
-      { // Store all pdf attachments from example2@example.com to the folder "Examples/example2"
-        "filter": "has:attachment from:example2@example.com",
-        "folder": "'Examples/example2'",
-        "filenameFromRegexp": ".*\.pdf$"
-      },
-      { // Store all attachments from example3a@example.com OR from:example3b@example.com
-        // to the folder "Examples/example3ab" while renaming all attachments to the pattern
-        // defined in 'filenameTo' and archive the thread.
-        "filter": "has:attachment (from:example3a@example.com OR from:example3b@example.com)",
-        "folder": "'Examples/example3ab'",
-        "filenameTo": "'file-'yyyy-MM-dd-'%s.txt'",
-        "archive": true
-      },
-      {
-        // Store threads marked with label "PDF" in the folder "PDF Emails" als PDF document.
-        "filter": "label:PDF",
-        "saveThreadPDF": true,
-        "folder": "PDF Emails"
-      },
-      { // Store all attachments named "file.txt" from example4@example.com to the
-        // folder "Examples/example4" and rename the attachment to the pattern
-        // defined in 'filenameTo' and archive the thread.
-        "filter": "has:attachment from:example4@example.com",
-        "folder": "'Examples/example4'",
-        "filenameFrom": "file.txt",
-        "filenameTo": "'file-'yyyy-MM-dd-'%s.txt'"
-      }
+      
+      // For more examples of customized rules, see https://github.com/ahochsteger/gmail2gdrive/blob/master/README.md
     ]
+  };
+}
+
+
+/**
+ * Konfiguration für das Logging der Attachments in einem Google Spreadsheet
+ */
+function getSpreadsheetLoggingConfig() {
+  return {
+    // Zum An-/Ausschalten des Spreadsheet-Loggings (an = true, aus = false)
+    "activateSpreadsheetLogging": true, 
+
+    // Die ID des Google Spreadsheets (kann man aus der URL entnehmen, wenn man das Spreadsheet geöffnet hat).
+    "spreadsheetId": "8ZW8JZnI2cHicfMYNSkA8ZHcKAuAskn4XInIOONFQqBA",
+
+    // Der Name des Tabellenblatts, auf dem die Zeilen eingefügt werden sollen.
+    "sheetName": "Mail Attachments",
+
+    // Der Spaltenindex für die Spalte, wo die jeweilige Information eingetragen wird. Spalte A wäre hier 1, B=2, C=3, ...
+    // Die neuen Einträge werden immer in die nächste freie Zeile in der angegebenen Spalte eingetragen.
+    "columns": {
+      "messageId": 1,
+      "mailInboxDate": 2, // Datum, an dem die Mail empfangen wurde
+      "originalFileName": 3,
+      "fileNameInDrive": 4,
+      "mailLink": 5, // direkter Link zur Mail in Gmail
+      "subject": 6, // Wird ignoriert, wenn unten splitSubject.activated == true ist
+
+      "splitSubject": {
+        "activated": true,
+        "separator": ";",
+        "keywords": [
+          {
+            "keyword": "Company:",
+            "column": 6,
+          },
+          {
+            "keyword": "Date:", // invoice date (mentioned in subject, marked with keyword "Date:")
+            "column": 7,
+          },
+          {
+            "keyword": "Category:",
+            "column": 8,
+          },
+          {
+            "keyword": "Invoice-No.:",
+            "column": 9,
+          },
+        ],
+      },
+    },
   };
 }

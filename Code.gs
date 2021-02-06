@@ -71,6 +71,21 @@ function getOrCreateFolder(folderName) {
 }
 
 /**
+ * Builds a custom filename based on values at keywords in the mail's subject.
+ */
+function buildFilename(rule, message, file, originalFileName) {
+  var allInfo = getAllMailAttachmentInfo(message, file, originalFileName);
+  var keywordsForFilename = rule.filenameBasedOnKeywords;
+
+  var values = [];
+  for (let keyword of keywordsForFilename) {
+    values.push(allInfo[keyword].value);
+  }
+  var filename = values.join("_");
+  return filename;
+}
+
+/**
  * Processes a message
  */
 function processMessage(message, rule, config) {
@@ -93,17 +108,27 @@ function processMessage(message, rule, config) {
       var folder = getOrCreateFolder(Utilities.formatDate(messageDate, config.timezone, rule.folder));
       var file = folder.createFile(attachment);
       var filename = file.getName();
+      var originalFileName = filename; // save original filename before it gets changed
+
+      var filenameReplacement = message.getSubject(); // default replacement for '%s' in template for filename ("filenameTo")
+      if (rule.filenameBasedOnKeywords) {
+        filenameReplacement = buildFilename(rule, message, file, originalFileName);
+      }
+
       if (rule.filenameFrom && rule.filenameTo && rule.filenameFrom == file.getName()) {
-        filename = Utilities.formatDate(messageDate, config.timezone, rule.filenameTo.replace('%s',message.getSubject()));
+        filename = Utilities.formatDate(messageDate, config.timezone, rule.filenameTo.replace('%s',filenameReplacement));
         Logger.log("INFO:           Renaming matched file '" + file.getName() + "' -> '" + filename + "'");
         file.setName(filename);
       }
       else if (rule.filenameTo) {
-        filename = Utilities.formatDate(messageDate, config.timezone, rule.filenameTo.replace('%s',message.getSubject()));
+        filename = Utilities.formatDate(messageDate, config.timezone, rule.filenameTo.replace('%s',filenameReplacement));
         Logger.log("INFO:           Renaming '" + file.getName() + "' -> '" + filename + "'");
         file.setName(filename);
       }
       file.setDescription("Mail title: " + message.getSubject() + "\nMail date: " + message.getDate() + "\nMail link: https://mail.google.com/mail/u/0/#inbox/" + message.getId());
+      
+      addRowToSpreadsheet(message, file, originalFileName);
+      
       Utilities.sleep(config.sleepTime);
     } catch (e) {
       Logger.log(e);
