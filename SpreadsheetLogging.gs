@@ -29,6 +29,9 @@ function getValuesOfSubjectComponents(subject, splitSubjectConfig) {
   
     const MAIL_LINK_BASE = "https://mail.google.com/mail/u/0/#inbox/";
     var mailLink = MAIL_LINK_BASE + message.getId();
+
+    const FILE_PREVIEW_LINK_BASE = "https://drive.google.com/open?id=";
+    var fileLink = FILE_PREVIEW_LINK_BASE + file.getId();
   
     var results = {
       "messageId": {
@@ -50,6 +53,10 @@ function getValuesOfSubjectComponents(subject, splitSubjectConfig) {
       "fileNameInDrive": {
         "value": file.getName(),
         "column": cols.fileNameInDrive,
+      },
+      "fileLink": {
+        "value": fileLink,
+        "column": cols.fileLink,
       },
       "mailLink": {
         "value": mailLink,
@@ -88,12 +95,20 @@ function getValuesOfSubjectComponents(subject, splitSubjectConfig) {
       var allInfo = getAllMailAttachmentInfo(message, file, originalFileName);
   
       for (let [keyword, obj] of Object.entries(allInfo)) {
+        var cell = sheet.getRange(nextRow, obj.column);
         if (keyword == "subject") {
           if (cols.splitSubject.activated) {
             continue;
-          }
+          } 
+        } else if (keyword == "mailLink") {
+          cell.setFormula('=HYPERLINK("'+ obj.value +'"; "Open in Gmail")');
+          continue;
+
+        } else if (keyword == "fileLink") {
+          cell.setFormula('=HYPERLINK("'+ obj.value +'"; "Open in GDrive")');
+          continue;
         }
-        sheet.getRange(nextRow, obj.column).setValue(obj.value);
+        cell.setValue(obj.value);
       }
     }
   }

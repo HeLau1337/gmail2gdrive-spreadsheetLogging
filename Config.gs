@@ -66,6 +66,7 @@ function getSpreadsheetLoggingConfig() {
       "originalFileName": 3,
       "fileNameInDrive": 4,
       "mailLink": 5, // direkter Link zur Mail in Gmail
+      "fileLink": 10, // direct link to file preview in Google Drive
       "subject": 6, // Wird ignoriert, wenn unten splitSubject.activated == true ist
 
       "splitSubject": {
