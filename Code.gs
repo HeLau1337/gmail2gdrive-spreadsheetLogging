@@ -82,6 +82,9 @@ function buildFilename(rule, message, file, originalFileName) {
     values.push(allInfo[keyword].value);
   }
   var filename = values.join("_");
+  if (filename == "_" || filename == "") {
+    filename = message.getSubject();
+  }
   return filename;
 }
 
